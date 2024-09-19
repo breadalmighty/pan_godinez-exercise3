@@ -74,6 +74,14 @@ Before running the project, ensure you have the following installed:
 
 1. Create a Product (POST) -> URL: http://localhost:3001/products
 
+    Body (raw JSON):
+
+        {
+        "name": "Product A",
+        "price": 100,
+        "description": "This is product A."
+        }
+
 2. Get Product by ID (GET) -> URL: http://localhost:3001/products/{productId}
 
 3. Update a Product (PUT) -> URL: http://localhost:3001/products/{productId}
