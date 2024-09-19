@@ -7,7 +7,7 @@ IT 3103N
 GitHub Repository: [pan_godinez-exercise3](https://github.com/breadalmighty/pan_godinez-exercise3.git)
 
 ## Table of Contents
-- [Prequisites](#prequisites)
+- [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Testing with Postman](#testing-with-postman)
   - [Customer Service](#customer-service)
