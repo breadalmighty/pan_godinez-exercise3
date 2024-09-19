@@ -20,23 +20,23 @@ Before running the project, ensure you have the following installed:
 - [Postman](https://www.postman.com/) for testing APIs
 
 ### Setup 
-1. Clone the repository to your local machine using this command:
-   git clone https://github.com/breadalmighty/pan_godinez-exercise3.git
-   cd pan_godinez-exercise3
+1. Clone the repository to your local machine using these commands:
+   (1) git clone https://github.com/breadalmighty/pan_godinez-exercise3.git and 
+   (2) cd pan_godinez-exercise3
 
 2. Navigate into each service's folder and run:
 
-//if customer service (port 3002)
+customer service (port 3002)
 
     cd microservices\costumer_service
     node server.js
 
-//if product service (port 3001)
+product service (port 3001)
 
     cd microservices\costumer_service
     node server.js
 
-//if order service (port 3003)
+order service (port 3003)
 
     cd microservices\costumer_service
     node server.js
