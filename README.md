@@ -1,6 +1,6 @@
 # Exercise 3: Designing and Building a Microservices API
-Pair: Nikki Jel M. Pan & Desiree Anne Godinez
-IT 3103N
+Pair: Nikki Jel Pan & Desiree Anne Godinez
+(IT 3103N)
 
 
 ## Repository
