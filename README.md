@@ -7,12 +7,12 @@ IT 3103N
 GitHub Repository: [pan_godinez-exercise3](https://github.com/breadalmighty/pan_godinez-exercise3.git)
 
 ## Table of Contents
-- [Setup and Installation](#setup-and-installation)
-- [Running the Services](#running-the-services)
+- [Prequisites](#prequesites)
+- [Setup](#setup)
 - [Testing with Postman](#testing-with-postman)
-  - [Customer Service Endpoints](#customer-service-endpoints)
-  - [Product Service Endpoints](#product-service-endpoints)
-  - [Order Service Endpoints](#order-service-endpoints)
+  - [Customer Service](#customer-service)
+  - [Product Service](#product-service)
+  - [Order Service](#order-service)
 
 ### Prerequisites
 Before running the project, ensure you have the following installed:
@@ -50,30 +50,32 @@ Before running the project, ensure you have the following installed:
 
     URL: http://localhost:3002/customers
     Method: POST
-    Body (raw JSON): 
+    Body (raw JSON):
+    
         {
         "name": "John Doe",
         "email": "john.doe@example.com",
         "age": 30
         }
 
-2. Get Customer by ID (GET)
+3. Get Customer by ID (GET)
 
     URL: http://localhost:3002/customers/{customerId}
     Method: GET
 
-3. Update a Customer (PUT)
+4. Update a Customer (PUT)
 
     URL: http://localhost:3002/customers/{customerId}
     Method: PUT
-    Body (raw JSON): 
+    Body (raw JSON):
+   
         {
         "name": "Jane Doe",
         "email": "jane.doe@example.com",
         "age": 32
         }
 
-4. Delete a Customer (DELETE)
+6. Delete a Customer (DELETE)
 
     URL: http://localhost:3002/customers/{customerId}
     Method: DELETE
@@ -94,14 +96,15 @@ Before running the project, ensure you have the following installed:
 
     URL: http://localhost:3001/products/{productId}
     Method: PUT
-    Body (raw JSON): 
+    Body (raw JSON):
+   
         {
         "name": "Product B",
         "price": 120,
         "description": "This is updated product B."
         }
 
-4. Delete a Product (DELETE)
+5. Delete a Product (DELETE)
 
     URL: http://localhost:3001/products/{productId}
     Method: DELETE
@@ -113,22 +116,24 @@ Before running the project, ensure you have the following installed:
     URL: http://localhost:3003/orders
     Method: POST
     Body (raw JSON):
+   
         {
         "customerId": 1,
         "productId": 1,
         "quantity": 2
         }
 
-2. Get Order by ID (GET)
+3. Get Order by ID (GET)
 
     URL: http://localhost:3003/orders/{orderId}
     Method: GET
 
-3. Update an Order (PUT)
+4. Update an Order (PUT)
 
     URL: http://localhost:3003/orders/{orderId}
     Method: PUT
     Body (raw JSON):
+   
         {
         "quantity": 3
         }
