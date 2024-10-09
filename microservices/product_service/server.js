@@ -1,20 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const https = require('https');
+const fs = require('fs');
 const app = express();
-const port = 3001;
-
 app.use(bodyParser.json());
+const PORT = 3001;
 
 let products = [];
 
-// POST - add a new product
+// Load SSL certificate and key
+const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert'),
+  };
+
+// Start HTTPS server
+const server = https.createServer(options, app);
+server.listen(PORT, () => {
+  console.log(`Product Service running on https://localhost:${PORT}`);
+});
+
+// POST - Add a new product
 app.post('/products', (req, res) => {
     const product = { id: products.length + 1, ...req.body };
     products.push(product);
     res.status(201).json(product);
 });
 
-// GET - get product details by ID
+// GET - Get product details by ID
 app.get('/products/:productId', (req, res) => {
     const product = products.find(p => p.id === parseInt(req.params.productId));
     if (!product) {
@@ -43,6 +56,4 @@ app.delete('/products/:productId', (req, res) => {
     res.status(204).send();
 });
 
-app.listen(port, () => {
-    console.log(`Product Service running on port ${port}`);
-});
+

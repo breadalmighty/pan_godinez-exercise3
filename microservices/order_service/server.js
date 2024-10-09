@@ -1,25 +1,39 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const https = require('https');
+const fs = require('fs');
 const app = express();
-const port = 3003;
-
 app.use(bodyParser.json());
+const PORT = 3003;
 
 let orders = [];
+
+// Load SSL certificate and key
+const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert'),
+  };
+
+
+// Start HTTPS server
+const server = https.createServer(options, app);
+server.listen(PORT, () => {
+  console.log(`Order Service running on https://localhost:${PORT}`);
+});
 
 // POST - Create a new order
 app.post('/orders', async (req, res) => {
     const { customerId, productId } = req.body;
 
     try {
-        // Verify customer exists by calling Customer Service
+        // Verify customer exists
         const customerResponse = await axios.get(`http://localhost:3002/customers/${customerId}`);
         if (!customerResponse.data) {
             return res.status(404).json({ message: 'Customer not found' });
         }
 
-        // Verify product exists by calling Product Service
+        // Verify product exists
         const productResponse = await axios.get(`http://localhost:3001/products/${productId}`);
         if (!productResponse.data) {
             return res.status(404).json({ message: 'Product not found' });
@@ -63,6 +77,3 @@ app.delete('/orders/:orderId', (req, res) => {
     res.status(204).send();
 });
 
-app.listen(port, () => {
-    console.log(`Order Service running on port ${port}`);
-});
