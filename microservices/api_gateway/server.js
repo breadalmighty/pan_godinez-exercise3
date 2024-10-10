@@ -5,6 +5,7 @@ const axios = require('axios');
 const expressRateLimit = require('express-rate-limit');
 const https = require('https');
 const fs = require('fs');
+const Joi = require('joi');
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
@@ -19,25 +20,50 @@ const limiter = expressRateLimit({
 });
 app.use(limiter);
 
-// Dummy users with hashed passwords for demonstration
+// HTTPS server with OPENSSL key and cert
+const options = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.cert'),
+};
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false 
+});
+const server = https.createServer(options, app);
+server.listen(PORT, () => {
+  console.log(`API Gateway is running on port ${PORT}`);
+});
+
+// Users
 const users = [
   { id: 1, username: 'customer', password: bcrypt.hashSync('password123', 10), role: 'customer' },
   { id: 2, username: 'order', password: bcrypt.hashSync('password123', 10), role: 'order' },
   { id: 3, username: 'product', password: bcrypt.hashSync('password123', 10), role: 'product' }
 ];
 
-// Login route to authenticate users and issue JWT
+// User login validation
+const loginSchema = Joi.object({
+  username: Joi.string().min(3).required(),
+  password: Joi.string().min(6).required()
+});
+
+// Login route with JWT
 app.post('/login', async (req, res) => {
+  const { error } = loginSchema.validate(req.body);  
+  if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+  }
+
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
 
   if (!user) {
-    return res.status(400).json({ message: 'Invalid username or password' });
+      return res.status(400).json({ message: 'Invalid username or password' });
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
+  
   if (!validPassword) {
-    return res.status(400).json({ message: 'Invalid username or password' });
+      return res.status(400).json({ message: 'Invalid username or password' });
   }
 
   const token = jwt.sign({ username: user.username, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
@@ -55,7 +81,6 @@ function authenticateToken(requiredRoles) {
     jwt.verify(token, SECRET_KEY, (err, user) => {
       if (err) return res.sendStatus(403);
       
-      // Check if user role is allowed
       if (requiredRoles && !requiredRoles.includes(user.role)) {
         return res.status(403).json({ message: 'Access forbidden: insufficient rights' });
       }
@@ -66,27 +91,14 @@ function authenticateToken(requiredRoles) {
   };
 }
 
-// HTTPS setup
-const options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.cert'),
-};
-
-// Create an HTTPS agent
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false // For development only; use proper SSL certificates in production
-});
-
-const server = https.createServer(options, app);
-
-// Proxy routes to other services
+// Routes
 app.use('/customer', authenticateToken(['customer']), async (req, res) => {
   try {
     const response = await axios({
       method: req.method,
       url: `https://localhost:3002${req.path}`,
       data: req.body,
-      httpsAgent: httpsAgent // Use the HTTPS agent
+      httpsAgent: httpsAgent 
     });
     res.json(response.data);
   } catch (err) {
@@ -104,7 +116,7 @@ app.use('/order', authenticateToken(['order']), async (req, res) => {
       method: req.method,
       url: `https://localhost:3003${req.path}`,
       data: req.body,
-      httpsAgent: httpsAgent // Use the HTTPS agent
+      httpsAgent: httpsAgent 
     });
     res.json(response.data);
   } catch (err) {
@@ -122,7 +134,7 @@ app.use('/product', authenticateToken(['product']), async (req, res) => {
       method: req.method,
       url: `https://localhost:3001${req.path}`,
       data: req.body,
-      httpsAgent: httpsAgent // Use the HTTPS agent
+      httpsAgent: httpsAgent 
     });
     res.json(response.data);
   } catch (err) {
@@ -132,9 +144,4 @@ app.use('/product', authenticateToken(['product']), async (req, res) => {
       error: err.response?.data || err.message
     });
   }
-});
-
-// Start the server
-server.listen(PORT, () => {
-  console.log(`API Gateway is running on port ${PORT}`);
 });
