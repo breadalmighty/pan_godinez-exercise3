@@ -13,13 +13,12 @@ let orders = [];
 const options = {
     key: fs.readFileSync('server.key'),
     cert: fs.readFileSync('server.cert'),
-  };
-
+};
 
 // Start HTTPS server
 const server = https.createServer(options, app);
 server.listen(PORT, () => {
-  console.log(`Order Service running on https://localhost:${PORT}`);
+    console.log(`Order Service running on https://localhost:${PORT}`);
 });
 
 // POST - Create a new order
@@ -28,13 +27,13 @@ app.post('/orders', async (req, res) => {
 
     try {
         // Verify customer exists
-        const customerResponse = await axios.get(`http://localhost:3002/customers/${customerId}`);
+        const customerResponse = await axios.get(`https://localhost:3002/customers/${customerId}`, { httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
         if (!customerResponse.data) {
             return res.status(404).json({ message: 'Customer not found' });
         }
 
         // Verify product exists
-        const productResponse = await axios.get(`http://localhost:3001/products/${productId}`);
+        const productResponse = await axios.get(`https://localhost:3001/products/${productId}`, { httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
         if (!productResponse.data) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -44,6 +43,7 @@ app.post('/orders', async (req, res) => {
         res.status(201).json(order);
 
     } catch (error) {
+        console.error('Error creating order:', error.message); 
         res.status(500).json({ message: 'Error creating order', error: error.message });
     }
 });
@@ -76,4 +76,3 @@ app.delete('/orders/:orderId', (req, res) => {
     orders.splice(orderIndex, 1);
     res.status(204).send();
 });
-
